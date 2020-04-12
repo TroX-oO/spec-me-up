@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.ql-container {
+  min-height: 10em;
+  border-bottom-left-radius: 0.5em;
+  border-bottom-right-radius: 0.5em;
+  background: #fefcfc;
+}
+
+.ql-editor {
+  min-height: 10em;
+}
+
+.ql-toolbar {
+  background: #eaecec;
+  border-top-left-radius: 0.5em;
+  border-top-right-radius: 0.5em;
+  border-bottom: none;
+}
+
+.octicon {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  display: block;
+}

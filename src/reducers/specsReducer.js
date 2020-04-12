@@ -6,9 +6,9 @@ export default (state = {}, action) => {
       const id = v4();
       return {
         ...state,
-        [id]: { name: `Test ${id}`}
-      }
-   default:
-    return state
+        [id]: { name: `Test ${id}` }
+      };
+    default:
+      return state;
   }
- }
+};
