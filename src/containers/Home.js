@@ -5,26 +5,9 @@ import { createEditor, Transforms, Editor, Range } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 
-import SpecListContainer from './speclist';
-import SlateEditor from './editor/SlateEditor';
-
-const Page = styled.div`
-  position: absolute;
-  background: #eee;
-  width: 100%;
-  height: 100%;
-`;
-
-const Header = styled.h1`
-  color: #333;
-  text-align: center;
-`;
-
-const SubHeader = styled.span`
-  color: #333;
-  font-size: 40%;
-  margin-left: 10px;
-`;
+import { createSpecProject } from '../actions/spec';
+import SpecListContainer from './speclist/SpecListContainer';
+import SlateEditor from '../components/editor/SlateEditor';
 
 const withFixMe = (editor) => {
   const { isInline, isVoid } = editor;
@@ -62,38 +45,18 @@ const Home = (props) => {
 
   console.log('render home !', props);
   return (
-    <Page>
-      <Header>
-        Spec Me Up<SubHeader>Before you no go</SubHeader>
-      </Header>
-      <button onClick={() => props.createSpecProject()}>Create project</button>
-      <button
-        onClick={() => {
-          setSaved(editor.children);
-        }}
-      >
-        Export/import
+    <>
+      <button onClick={() => props.createSpecProject(Date.now())}>
+        Create project
       </button>
       <SpecListContainer />
-      {!saved && (
-        <SlateEditor editor={editor} onFixMeSelected={onFixMeSelected} />
-      )}
-      {saved && (
-        <SlateEditor
-          editor={editor2}
-          onFixMeSelected={onFixMeSelected2}
-          saved={saved}
-        />
-      )}
-      <div>Selected FixMe: {selectedFixMe}</div>
-      <div>Selected FixMe: {selectedFixMe2}</div>
-    </Page>
+    </>
   );
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    createSpecProject: () => dispatch((d) => d({ type: 'ADD_SPEC_PROJECT' }))
+    createSpecProject: (name) => dispatch(createSpecProject(name))
   };
 };
 

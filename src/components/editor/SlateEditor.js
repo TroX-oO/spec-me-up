@@ -11,7 +11,7 @@ import { createEditor, Transforms, Editor, Range } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { v4 } from 'uuid';
-import FixMe from '../fixme';
+import FixMe from '../../containers/fixme/FixMe';
 
 const Element = (props) => {
   const { attributes, children, element } = props;

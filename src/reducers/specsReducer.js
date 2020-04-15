@@ -1,12 +1,12 @@
-import { v4 } from 'uuid';
+// @flow
+import { SpecActions } from '../types/actions/spec';
 
-export default (state = {}, action) => {
+export default (state: Object = {}, action: Object) => {
   switch (action.type) {
-    case 'ADD_SPEC_PROJECT':
-      const id = v4();
+    case SpecActions.CREATE_SPEC_PROJECT:
       return {
         ...state,
-        [id]: { name: `Test ${id}` }
+        [action.id]: { name: action.name, fixmes: [] }
       };
     default:
       return state;
