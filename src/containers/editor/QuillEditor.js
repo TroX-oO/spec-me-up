@@ -3,7 +3,8 @@ import React, {
   useRef,
   useEffect,
   useCallback,
-  useMemo
+  useMemo,
+  forwardRef
 } from 'react';
 import { Provider } from 'react-redux';
 import configureStore from '../../store';
@@ -78,9 +79,8 @@ function insertFixMe(callback) {
     this.quill.setSelection(cursorPosition + 1);
   };
 }
-const QuillEditor = (props) => {
-  const editor = useRef(null);
-  const [value, setValue] = useState('');
+const QuillEditor = forwardRef((props, editor) => {
+  const [value, setValue] = useState(props.saved || '');
 
   const formats = useMemo(
     () => [
@@ -114,6 +114,18 @@ const QuillEditor = (props) => {
     []
   );
 
+  useEffect(() => {
+    console.log();
+    if (editor && editor.current) {
+      editor.current.getEditor().on('text-change', (a, b, c) => {
+        console.log(a);
+        console.log(b);
+        console.log(c);
+        console.log(editor.current.getEditor().getContents());
+      });
+    }
+  }, [editor]);
+
   return (
     <>
       <CustomToolbar />
@@ -127,6 +139,6 @@ const QuillEditor = (props) => {
       />
     </>
   );
-};
+});
 
 export default QuillEditor;

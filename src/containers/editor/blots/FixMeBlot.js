@@ -27,6 +27,12 @@ class FixMeBlot extends Embed {
   static value(domNode) {
     return domNode.dataset.id;
   }
+
+  update(mutations, context) {
+    super.update(mutations, context);
+
+    console.log(mutations, context);
+  }
 }
 
 FixMeBlot.blotName = 'fixme';

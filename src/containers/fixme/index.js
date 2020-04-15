@@ -15,29 +15,33 @@ const Block = styled.span`
 `;
 
 const FixMe = (props) => {
-  const idRef = useRef(props.id || v4());
+  const idRef = useRef(props.element.id || v4());
 
   useEffect(() => {
-    console.error('onMount !');
+    console.error('onMount !', props);
 
     return () => {
       console.error('onUnmount !');
     };
-  });
+  }, []);
 
   return (
     <Block
       data-type="fixme"
-      onClick={(e) => {
-        console.log('yeeeahh');
+      contentEditable={false}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        console.log('yeeeahh', props);
         if (props.onFixMeSelected) {
           props.onFixMeSelected(idRef.current);
         } else {
           console.info('I think there might be a problem...');
         }
       }}
+      {...props.attributes}
     >
-      FixMe
+      {idRef.current}
+      {props.children}
     </Block>
   );
 };
