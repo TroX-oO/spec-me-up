@@ -1,9 +1,11 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import { createEditor, Transforms, Editor, Range } from 'slate';
+import { Slate, Editable, withReact } from 'slate-react';
+import { withHistory } from 'slate-history';
 
 import SpecListContainer from './speclist';
-import QuillEditor from './editor/QuillEditor';
 import SlateEditor from './editor/SlateEditor';
 
 const Page = styled.div`
@@ -24,6 +26,19 @@ const SubHeader = styled.span`
   margin-left: 10px;
 `;
 
+const withFixMe = (editor) => {
+  const { isInline, isVoid } = editor;
+
+  editor.isInline = (element) => {
+    return element.type === 'fixme' ? true : isInline(element);
+  };
+
+  editor.isVoid = (element) => {
+    return element.type === 'fixme' ? true : isVoid(element);
+  };
+
+  return editor;
+};
 const Home = (props) => {
   const editorRef = useRef();
   const editorSlateRef = useRef();
@@ -36,6 +51,14 @@ const Home = (props) => {
   const onFixMeSelected2 = useCallback((id) => {
     setSelectedFixMe2(id);
   }, []);
+  const editor = useMemo(
+    () => withFixMe(withHistory(withReact(createEditor()), [])),
+    []
+  );
+  const editor2 = useMemo(
+    () => withFixMe(withHistory(withReact(createEditor()), [])),
+    []
+  );
 
   console.log('render home !', props);
   return (
@@ -45,19 +68,22 @@ const Home = (props) => {
       </Header>
       <button onClick={() => props.createSpecProject()}>Create project</button>
       <button
-        onClick={() => setSaved(editorRef.current.getEditor().getContents())}
+        onClick={() => {
+          setSaved(editor.children);
+        }}
       >
         Export/import
       </button>
       <SpecListContainer />
       {!saved && (
-        <QuillEditor ref={editorRef} onFixMeSelected={onFixMeSelected} />
-      )}
-      {!saved && (
-        <SlateEditor ref={editorSlateRef} onFixMeSelected={onFixMeSelected} />
+        <SlateEditor editor={editor} onFixMeSelected={onFixMeSelected} />
       )}
       {saved && (
-        <QuillEditor onFixMeSelected={onFixMeSelected2} saved={saved} />
+        <SlateEditor
+          editor={editor2}
+          onFixMeSelected={onFixMeSelected2}
+          saved={saved}
+        />
       )}
       <div>Selected FixMe: {selectedFixMe}</div>
       <div>Selected FixMe: {selectedFixMe2}</div>

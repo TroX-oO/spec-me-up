@@ -13,20 +13,6 @@ import { withHistory } from 'slate-history';
 import { v4 } from 'uuid';
 import FixMe from '../fixme';
 
-const withFixMe = (editor) => {
-  const { isInline, isVoid } = editor;
-
-  editor.isInline = (element) => {
-    return element.type === 'fixme' ? true : isInline(element);
-  };
-
-  editor.isVoid = (element) => {
-    return element.type === 'fixme' ? true : isVoid(element);
-  };
-
-  return editor;
-};
-
 const Element = (props) => {
   const { attributes, children, element } = props;
   console.error('render ! ', props);
@@ -50,11 +36,7 @@ const DEFAULT = [
   }
 ];
 const SlateEditor = forwardRef((props, ref) => {
-  console.error('re-render Slate editor');
-  const editor = useMemo(
-    () => withFixMe(withHistory(withReact(createEditor()), [])),
-    []
-  );
+  console.error('re-render Slate editor', ref);
   const [value, setValue] = useState(props.saved || DEFAULT);
   console.log(props);
   const editorRef = useRef(null);
@@ -66,21 +48,26 @@ const SlateEditor = forwardRef((props, ref) => {
   );
 
   return (
-    <Slate editor={editor} value={value} onChange={(value) => setValue(value)}>
+    <Slate
+      editor={props.editor}
+      value={value}
+      onChange={(value) => setValue(value)}
+    >
       <div
         onMouseDown={(e) => {
           e.preventDefault();
-          Transforms.insertNodes(editor, {
+          Transforms.insertNodes(props.editor, {
             type: 'fixme',
             id: v4(),
             children: [{ text: '' }]
           });
-          Transforms.move(editor);
+          Transforms.move(props.editor);
         }}
       >
         fixme
       </div>
       <Editable
+        ref={ref}
         renderElement={renderElement}
         onBlur={(e, f, g) => {
           console.log(e);
