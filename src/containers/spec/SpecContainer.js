@@ -2,8 +2,8 @@ import React, { useState, useCallback, useRef, useMemo } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { createEditor, Transforms, Editor, Range } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
+import { createEditor } from 'slate';
+import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 import ContentEditable from 'react-contenteditable';
 
@@ -11,20 +11,17 @@ import { useTheme } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Drawer from '@material-ui/core/Drawer';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import DescriptionIcon from '@material-ui/icons/Description';
 
-import SpecListContainer from '../speclist/SpecListContainer';
+import ResourceNotFound from '../../components/ResourceNotFound';
 import FixMeListContainer from '../fixme/FixMeListContainer';
 import SlateEditorContainer from '../editor/SlateEditorContainer';
 
 import { renameSpecProject } from '../../actions/spec';
 
-const DrawerWidth = 240;
+const DrawerWidth = 500;
 
 const Container = styled(Box)`
   display: flex;
@@ -32,8 +29,11 @@ const Container = styled(Box)`
 `;
 
 const Content = styled(Box)`
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   margin-right: 0;
+  height: 100%;
   ${(props) =>
     `
     transition: ${props.theme.transitions.create('margin', {
@@ -65,7 +65,6 @@ const FixMeDrawer = styled(Drawer)`
     position: relative;
     width: ${DrawerWidth}px;
     height: 100%;
-    overflow: scroll;
   }
 `;
 
@@ -79,6 +78,11 @@ const ProjectName = styled(Typography)`
 const Name = styled(ContentEditable)`
   flex: 1;
   margin-right: 10px;
+  border: 1px solid transparent;
+
+  &:hover {
+    border: 1px solid #cecece;
+  }
 `;
 
 const withFixMe = (editor) => {
@@ -100,7 +104,7 @@ const SpecContainer = (props) => {
   const theme = useTheme();
   const [selectedFixMe, setSelectedFixMe] = useState(null);
   const [open, setOpen] = useState(true);
-  const newNameRef = useRef(props.spec.name);
+  const newNameRef = useRef(props.spec ? props.spec.name : null);
   const editor = useMemo(
     () => withFixMe(withHistory(withReact(createEditor()), [])),
     []
@@ -118,6 +122,10 @@ const SpecContainer = (props) => {
   const handleNameBlur = () => {
     props.renameProject(specId, newNameRef.current);
   };
+
+  if (!props.spec) {
+    return <ResourceNotFound />;
+  }
 
   return (
     <Container>
@@ -141,20 +149,12 @@ const SpecContainer = (props) => {
         <SlateEditorContainer
           specId={specId}
           editor={editor}
+          content={props.spec.content}
           onFixMeSelected={onFixMeSelected}
         />
         <div>Selected FixMe: {selectedFixMe}</div>
       </Content>
       <FixMeDrawer variant="persistent" anchor="right" open={open}>
-        <div>
-          <IconButton onClick={handleDrawerToggle}>
-            {theme.direction === 'rtl' ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </div>
         <FixMeListContainer
           specId={specId}
           selected={selectedFixMe}

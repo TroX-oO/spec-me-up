@@ -1,9 +1,6 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { createEditor, Transforms, Editor, Range } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
-import { withHistory } from 'slate-history';
 
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';

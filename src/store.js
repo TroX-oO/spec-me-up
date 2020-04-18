@@ -25,7 +25,7 @@ const saveState = (state) => {
 };
 let storeInstance = null;
 
-export default function configureStore(initialState = {}) {
+export default function configureStore() {
   if (!storeInstance) {
     const persistedState = loadState();
     const composeEnhancers =

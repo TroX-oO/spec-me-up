@@ -29,6 +29,15 @@ export default (state: Object = {}, action: Object) => {
           name: action.name
         }
       };
+    case SpecActions.SET_CONTENT:
+      // Set project content
+      return {
+        ...state,
+        [action.specId]: {
+          ...state[action.specId],
+          content: action.content
+        }
+      };
     case FixMeActions.CREATE:
       // Attach Fixme to spec
       return {

@@ -26,3 +26,10 @@ export const renameSpecProject = (specId: string, name: string) => {
     name
   };
 };
+export const setSpecContent = (specId: string, content: string) => {
+  return {
+    type: SpecActions.SET_CONTENT,
+    specId,
+    content
+  };
+};

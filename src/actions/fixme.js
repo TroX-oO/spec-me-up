@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 
 import { FixMeActions } from '../types/actions/fixme';
 
-export const createFixMe = (title: string, specId: string) => {
+export const createFixMe = (specId: string, title: string) => {
   const fixMeId = v4();
 
   return {

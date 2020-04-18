@@ -1,40 +1,21 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { v4 } from 'uuid';
 import { filter, isEmpty, map } from 'lodash';
 
 import Paper from '@material-ui/core/Paper';
-import Collapse from '@material-ui/core/Collapse';
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
-import ListItemText from '@material-ui/core/ListItemText';
+import Button from '@material-ui/core/Button';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import DeleteIcon from '@material-ui/icons/Delete';
 
 import { removeFixMe } from '../../actions/fixme';
 
-const FixMeLink = styled(Link)`
-  flex: 1;
-  color: inherit;
-  text-decoration: inherit;
-`;
-
-const renderFixMeListItem = (
-  fixme,
-  onClick,
-  onRemoveClick,
-  selected,
-  first
-) => {
+const renderFixMeListItem = (fixme, onClick, onRemoveClick, selected) => {
   const jsx = (
     <React.Fragment key={fixme.id}>
       <ExpansionPanel expanded={selected} onChange={onClick(fixme.id)}>
@@ -50,6 +31,15 @@ const renderFixMeListItem = (
             {fixme.title}
             {fixme.title}
             {fixme.title}
+            <Button
+              aria-label="delete"
+              variant="contained"
+              color="primary"
+              startIcon={<DeleteIcon />}
+              onClick={onRemoveClick(fixme.id)}
+            >
+              Remove
+            </Button>
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -59,8 +49,6 @@ const renderFixMeListItem = (
   return jsx;
 };
 const renderFixMeList = (fixmes, onClick, onRemoveClick, selected) => {
-  let first = true;
-
   return isEmpty(fixmes) ? (
     <ListItem dense>
       <Typography style={{ margin: 'auto' }}>No FixMes found</Typography>
@@ -68,15 +56,7 @@ const renderFixMeList = (fixmes, onClick, onRemoveClick, selected) => {
   ) : (
     map(fixmes, (s) => {
       const isSelected = s.id === selected;
-      const jsx = renderFixMeListItem(
-        s,
-        onClick,
-        onRemoveClick,
-        isSelected,
-        first
-      );
-
-      first = false;
+      const jsx = renderFixMeListItem(s, onClick, onRemoveClick, isSelected);
 
       return jsx;
     })

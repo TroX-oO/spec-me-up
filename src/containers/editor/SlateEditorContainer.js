@@ -1,30 +1,31 @@
-import React, {
-  useState,
-  forwardRef,
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect
-} from 'react';
+import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { createEditor, Transforms, Editor, Range } from 'slate';
-import { Slate, Editable, withReact } from 'slate-react';
-import { withHistory } from 'slate-history';
-import { v4 } from 'uuid';
+import { Transforms } from 'slate';
+import { Slate, Editable } from 'slate-react';
 
-import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 
 import { createFixMe } from '../../actions/fixme';
-import FixMe from '../fixme/FixMe';
+import { setSpecContent } from '../../actions/spec';
+import FixMe from './FixMe';
 import Toolbar from '../../components/editor/Toolbar';
 
-const EditorPaper = styled(Paper)`
+const EditorContainerPaper = styled(Paper)`
   &.MuiPaper-root {
     padding: 5px;
     background-color: #eaeaea;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 10px;
   }
+`;
+
+const EditorPaper = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  height: 100%;
 `;
 
 const TextEditorContainer = styled(Paper)`
@@ -32,6 +33,10 @@ const TextEditorContainer = styled(Paper)`
     width: 900px;
     padding: 20px;
     margin: auto;
+
+    line-height: 1.9;
+    height: calc(100% - 40px);
+    overflow-y: auto;
   }
 `;
 
@@ -48,26 +53,26 @@ const Element = (props) => {
 
 const DEFAULT = [
   {
-    children: [{ text: 'A line of text in a paragraph. ' }]
+    children: [{ text: '' }]
   }
 ];
-const SlateEditorContainer = forwardRef((props, ref) => {
-  const [value, setValue] = useState(DEFAULT);
+const SlateEditorContainer = (props) => {
+  const [value, setValue] = useState(props.content || DEFAULT);
   console.log(props);
 
-  const callback = props.onFixMeSelected;
   const renderElement = useCallback(
-    (props) => <Element {...props} onFixMeSelected={callback} />,
+    (p) => <Element {...p} onFixMeSelected={props.onFixMeSelected} />,
     []
   );
 
+  const handleChange = (value) => {
+    setValue(value);
+    props.setSpecContent(value);
+  };
+
   return (
-    <EditorPaper square>
-      <Slate
-        editor={props.editor}
-        value={value}
-        onChange={(value) => setValue(value)}
-      >
+    <EditorContainerPaper square>
+      <Slate editor={props.editor} value={value} onChange={handleChange}>
         <div
           onMouseDown={(e) => {
             e.preventDefault();
@@ -83,28 +88,33 @@ const SlateEditorContainer = forwardRef((props, ref) => {
           fixme
         </div>
         <Toolbar />
-        <TextEditorContainer square>
-          <Editable
-            renderElement={renderElement}
-            onBlur={(e, f, g) => {
-              console.log(e);
-              console.log(f);
-              console.log(g);
-            }}
-          />
-        </TextEditorContainer>
+        <EditorPaper square>
+          <TextEditorContainer square>
+            <Editable
+              renderElement={renderElement}
+              onBlur={(e, f, g) => {
+                console.log(e);
+                console.log(f);
+                console.log(g);
+              }}
+            />
+          </TextEditorContainer>
+        </EditorPaper>
       </Slate>
-    </EditorPaper>
+    </EditorContainerPaper>
   );
-});
+};
 
 const mapDispatchToProps = (dispatch, props) => {
   return {
     createFixMe: (title) => {
-      const createFixMeAction = createFixMe(title, props.specId);
+      const createFixMeAction = createFixMe(props.specId, title);
 
       dispatch(createFixMeAction);
       return createFixMeAction.fixMeId;
+    },
+    setSpecContent: (content) => {
+      dispatch(setSpecContent(props.specId, content));
     }
   };
 };

@@ -41,7 +41,7 @@ const BoldButton = () => {
   );
 };
 
-const Toolbar = (props) => {
+const Toolbar = () => {
   return (
     <ToolbarContainer>
       <BoldButton />
