@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { v4 } from 'uuid';
+import { find } from 'lodash';
 
 const Block = styled.span`
   border: 1px solid black;
@@ -15,39 +16,32 @@ const Block = styled.span`
 `;
 
 const FixMe = (props) => {
-  const idRef = useRef(props.element.id || v4());
-
-  useEffect(() => {
-    console.error('onMount !', props);
-
-    return () => {
-      console.error('onUnmount !');
-    };
-  }, []);
-
+  console.log(props);
   return (
     <Block
       data-type="fixme"
       contentEditable={false}
       onMouseDown={(e) => {
         e.preventDefault();
-        console.log('yeeeahh', props);
+
         if (props.onFixMeSelected) {
-          props.onFixMeSelected(idRef.current);
+          props.onFixMeSelected(props.element.id);
         } else {
           console.info('I think there might be a problem...');
         }
       }}
       {...props.attributes}
     >
-      {idRef.current}
+      {props.fixme.title}
       {props.children}
     </Block>
   );
 };
 
-const mapStateToProps = (state) => {
-  return {};
+const mapStateToProps = (state, props) => {
+  return {
+    fixme: find(state.fixmes, (f) => f.id === props.element.id)
+  };
 };
 
 export default connect(mapStateToProps)(FixMe);

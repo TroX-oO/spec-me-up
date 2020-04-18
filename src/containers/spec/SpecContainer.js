@@ -5,9 +5,81 @@ import styled from 'styled-components';
 import { createEditor, Transforms, Editor, Range } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
+import ContentEditable from 'react-contenteditable';
+
+import { useTheme } from '@material-ui/core/styles';
+import Box from '@material-ui/core/Box';
+import Drawer from '@material-ui/core/Drawer';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import DescriptionIcon from '@material-ui/icons/Description';
 
 import SpecListContainer from '../speclist/SpecListContainer';
-import SlateEditor from '../../components/editor/SlateEditor';
+import FixMeListContainer from '../fixme/FixMeListContainer';
+import SlateEditorContainer from '../editor/SlateEditorContainer';
+
+import { renameSpecProject } from '../../actions/spec';
+
+const DrawerWidth = 240;
+
+const Container = styled(Box)`
+  display: flex;
+  height: 100%;
+`;
+
+const Content = styled(Box)`
+  flex-grow: 1;
+  margin-right: 0;
+  ${(props) =>
+    `
+    transition: ${props.theme.transitions.create('margin', {
+      easing: props.theme.transitions.easing.sharp,
+      duration: props.theme.transitions.duration.leavingScreen
+    })};
+  `}
+
+  ${(props) =>
+    props.contentShift &&
+    `
+    transition: ${props.theme.transitions.create('margin', {
+      easing: props.theme.transitions.easing.easeOut,
+      duration: props.theme.transitions.duration.enteringScreen
+    })};
+    margin-right: -${DrawerWidth}px;
+  `}
+`;
+
+const FixMeDrawer = styled(Drawer)`
+  &.MuiDrawer-docked {
+    flex-shrink: 0;
+    width: ${DrawerWidth}px;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .MuiDrawer-paper {
+    position: relative;
+    width: ${DrawerWidth}px;
+    height: 100%;
+    overflow: scroll;
+  }
+`;
+
+const ProjectName = styled(Typography)`
+  background-color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+`;
+
+const Name = styled(ContentEditable)`
+  flex: 1;
+  margin-right: 10px;
+`;
 
 const withFixMe = (editor) => {
   const { isInline, isVoid } = editor;
@@ -22,8 +94,13 @@ const withFixMe = (editor) => {
 
   return editor;
 };
+
 const SpecContainer = (props) => {
+  const { specId } = props.match.params;
+  const theme = useTheme();
   const [selectedFixMe, setSelectedFixMe] = useState(null);
+  const [open, setOpen] = useState(true);
+  const newNameRef = useRef(props.spec.name);
   const editor = useMemo(
     () => withFixMe(withHistory(withReact(createEditor()), [])),
     []
@@ -32,24 +109,72 @@ const SpecContainer = (props) => {
     setSelectedFixMe(id);
   }, []);
 
+  const handleDrawerToggle = () => {
+    setOpen((prev) => !prev);
+  };
+  const handleNameChange = (evt) => {
+    newNameRef.current = evt.target.value;
+  };
+  const handleNameBlur = () => {
+    props.renameProject(specId, newNameRef.current);
+  };
+
   return (
-    <>
-      <h1>{props.spec.name}</h1>
-      <h4>{props.match.params.specId}</h4>
-      <SlateEditor editor={editor} onFixMeSelected={onFixMeSelected} />
-      <div>Selected FixMe: {selectedFixMe}</div>
-    </>
+    <Container>
+      <Content theme={theme} contentShift={!open}>
+        <ProjectName variant="h5">
+          <DescriptionIcon fontSize="large" color="primary" />
+          <Name
+            contenteditable="true"
+            html={newNameRef.current}
+            onChange={handleNameChange}
+            onBlur={handleNameBlur}
+          ></Name>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleDrawerToggle}
+          >
+            {open ? 'Hide' : 'Show'} FixMes
+          </Button>
+        </ProjectName>
+        <SlateEditorContainer
+          specId={specId}
+          editor={editor}
+          onFixMeSelected={onFixMeSelected}
+        />
+        <div>Selected FixMe: {selectedFixMe}</div>
+      </Content>
+      <FixMeDrawer variant="persistent" anchor="right" open={open}>
+        <div>
+          <IconButton onClick={handleDrawerToggle}>
+            {theme.direction === 'rtl' ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )}
+          </IconButton>
+        </div>
+        <FixMeListContainer
+          specId={specId}
+          selected={selectedFixMe}
+          onFixMeSelected={onFixMeSelected}
+        />
+      </FixMeDrawer>
+    </Container>
   );
 };
 
 const mapStateToProps = (state, props) => {
+  console.log(props);
+  console.log(state);
   return {
     spec: state.specs[props.match.params.specId]
   };
 };
 const mapDispatchToProps = (dispatch) => {
   return {
-    createSpecProject: () => dispatch((d) => d({ type: 'ADD_SPEC_PROJECT' }))
+    renameProject: (id, name) => dispatch(renameSpecProject(id, name))
   };
 };
 

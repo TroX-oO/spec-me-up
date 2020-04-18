@@ -4,25 +4,66 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { isEmpty, map } from 'lodash';
 
-const Row = styled.div`
-  color: #333;
-  margin-left: 10px;
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import Divider from '@material-ui/core/Divider';
+import Typography from '@material-ui/core/Typography';
+
+import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ListItemText from '@material-ui/core/ListItemText';
+
+import { removeSpecProject } from '../../actions/spec';
+
+const ProjectLink = styled(Link)`
+  flex: 1;
+  color: inherit;
+  text-decoration: inherit;
 `;
 
-const SpecListContainer = (props) => {
+const renderSpecList = (specs, onClick) => {
+  let first = true;
+
   return (
-    <>
-      {isEmpty(props.specs) ? (
-        <div>Aucune specs</div>
+    <List>
+      {isEmpty(specs) ? (
+        <ListItem dense>
+          <Typography style={{ margin: 'auto' }}>No projects found</Typography>
+        </ListItem>
       ) : (
-        map(props.specs, (s, id) => (
-          <Row key={s.name}>
-            <Link to={`/spec/${id}`}>{s.name}</Link>
-          </Row>
-        ))
+        map(specs, (s) => {
+          const jsx = (
+            <React.Fragment key={s.id}>
+              {!first && <Divider />}
+              <ListItem dense button>
+                <ProjectLink to={`/spec/${s.id}`}>
+                  <ListItemText>{s.name}</ListItemText>
+                </ProjectLink>
+                <IconButton
+                  aria-label="delete"
+                  color="primary"
+                  onClick={onClick(s.id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </ListItem>
+            </React.Fragment>
+          );
+
+          first = false;
+
+          return jsx;
+        })
       )}
-    </>
+    </List>
   );
+};
+
+const SpecListContainer = (props) => {
+  const handleRemoveClick = (id) => () => {
+    props.removeProject(id);
+  };
+  return renderSpecList(props.specs, handleRemoveClick);
 };
 
 const mapStateToProps = (state) => {
@@ -31,4 +72,10 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(SpecListContainer);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    removeProject: (id) => dispatch(removeSpecProject(id))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SpecListContainer);

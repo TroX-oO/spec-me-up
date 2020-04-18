@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.9.10",
+    "@material-ui/icons": "^4.9.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "lodash": "^4.17.15",
     "react": "^16.13.1",
+    "react-contenteditable": "^3.3.4",
     "react-dom": "^16.13.1",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.1.2",
@@ -18,6 +21,7 @@
     "slate-history": "^0.57.1",
     "slate-react": "^0.57.1",
     "styled-components": "^5.0.1",
+    "typeface-roboto": "^0.0.75",
     "uuid": "^7.0.3"
   },
   "scripts": {

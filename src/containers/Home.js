@@ -5,52 +5,100 @@ import { createEditor, Transforms, Editor, Range } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
 
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
+import Box from '@material-ui/core/Box';
+import Divider from '@material-ui/core/Divider';
+import TextField from '@material-ui/core/TextField';
+
 import { createSpecProject } from '../actions/spec';
 import SpecListContainer from './speclist/SpecListContainer';
-import SlateEditor from '../components/editor/SlateEditor';
 
-const withFixMe = (editor) => {
-  const { isInline, isVoid } = editor;
+const HomeContainer = styled(Box)`
+  margin: 50px auto 0 auto;
+  padding: 10px;
+  width: 900px;
+`;
 
-  editor.isInline = (element) => {
-    return element.type === 'fixme' ? true : isInline(element);
-  };
+const ProjectPanel = styled(Paper)`
+  display: flex;
+  width: 100%;
+`;
 
-  editor.isVoid = (element) => {
-    return element.type === 'fixme' ? true : isVoid(element);
-  };
+const CreateProjectCollapse = styled(Collapse)`
+  margin-left: 10px;
 
-  return editor;
-};
+  .collapse form > * {
+    margin: 5px 0;
+  }
+`;
+
+const GridItem = styled(Grid)`
+  ${(props) => (props.alignCenter ? 'text-align: center;' : '')}
+`;
+
 const Home = (props) => {
-  const editorRef = useRef();
-  const editorSlateRef = useRef();
-  const [selectedFixMe, setSelectedFixMe] = useState(null);
-  const [selectedFixMe2, setSelectedFixMe2] = useState(null);
-  const [saved, setSaved] = useState(null);
-  const onFixMeSelected = useCallback((id) => {
-    setSelectedFixMe(id);
-  }, []);
-  const onFixMeSelected2 = useCallback((id) => {
-    setSelectedFixMe2(id);
-  }, []);
-  const editor = useMemo(
-    () => withFixMe(withHistory(withReact(createEditor()), [])),
-    []
-  );
-  const editor2 = useMemo(
-    () => withFixMe(withHistory(withReact(createEditor()), [])),
-    []
-  );
+  const [showCreateInput, setShowCreateInput] = React.useState(false);
+  const [name, setName] = React.useState('');
 
-  console.log('render home !', props);
+  const handleCreateProjectClicked = () => {
+    setShowCreateInput((prev) => !prev);
+  };
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    props.createSpecProject(name);
+    setShowCreateInput(false);
+  };
+
   return (
-    <>
-      <button onClick={() => props.createSpecProject(Date.now())}>
-        Create project
-      </button>
-      <SpecListContainer />
-    </>
+    <HomeContainer>
+      <Grid container spacing={3}>
+        <GridItem item xs={9}>
+          <Typography variant="h5">Your projects</Typography>
+          <Divider style={{ marginBottom: 10, marginTop: 10 }} />
+          <CreateProjectCollapse
+            in={showCreateInput}
+            classes={{ wrapperInner: 'collapse' }}
+          >
+            <Typography variant="h6">Create new project</Typography>
+            <form onSubmit={handleSubmit}>
+              <TextField
+                id="spec-name"
+                label="Project name"
+                value={name}
+                onChange={handleNameChange}
+                fullWidth
+              />
+              <Button variant="contained" color="primary" type="submit">
+                Create
+              </Button>
+            </form>
+          </CreateProjectCollapse>
+        </GridItem>
+        <GridItem item xs={3}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            onClick={handleCreateProjectClicked}
+          >
+            Create project
+          </Button>
+        </GridItem>
+
+        <ProjectPanel>
+          <GridItem item xs={12} style={{ padding: 0 }}>
+            <SpecListContainer />
+          </GridItem>
+        </ProjectPanel>
+      </Grid>
+    </HomeContainer>
   );
 };
 

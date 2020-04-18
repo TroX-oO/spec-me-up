@@ -11,23 +11,32 @@ import {
 import { createBrowserHistory } from 'history';
 
 import styled from 'styled-components';
+import Box from '@material-ui/core/Box';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
 
 import SpecContainer from './containers/spec/SpecContainer';
 
-const Page = styled.div`
+const Page = styled(Box)`
   position: absolute;
-  background: #eee;
   width: 100%;
   height: 100%;
 `;
 
-const Header = styled.h1`
-  color: #333;
-  text-align: center;
+const Content = styled(Box)`
+  width: 100%;
+  height: calc(100% - 64px);
+`;
+
+const AppName = styled(Link)`
+  color: inherit;
+  text-decoration: inherit;
 `;
 
 const SubHeader = styled.span`
-  color: #333;
   font-size: 40%;
   margin-left: 10px;
 `;
@@ -38,18 +47,26 @@ function App() {
   return (
     <Router history={history}>
       <Page>
-        <Header onClick={() => history.goBack()}>
-          Spec Me Up<SubHeader>Before you no go</SubHeader>
-        </Header>
+        <AppBar position="relative">
+          <Toolbar variant="regular">
+            <Typography variant="h4" color="inherit">
+              <AppName to="/">
+                Spec Me Up<SubHeader>Before you no go</SubHeader>
+              </AppName>
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/spec/:specId">
-            <SpecContainer />
-          </Route>
-        </Switch>
+        <Content>
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/spec/:specId">
+              <SpecContainer />
+            </Route>
+          </Switch>
+        </Content>
       </Page>
     </Router>
   );
