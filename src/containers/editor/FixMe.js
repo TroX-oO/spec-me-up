@@ -7,13 +7,14 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 
 const Block = styled.span`
-  border: 1px solid black;
+  border: 1px dashed black;
+  border-radius: 5px;
   cursor: pointer;
   padding: 2px 5px;
   margin-right: 1px;
 
   &:hover {
-    border: 1px solid red;
+    border-style: solid;
   }
   ${(props) =>
     !props.isAvailable &&
@@ -25,15 +26,25 @@ const Block = styled.span`
       border: 1px solid lightgray;
     }
   `}
+  }
+  ${(props) =>
+    props.validated &&
+    `
+    border: 1px solid transparent;
+    background-color: #78ff78;
+  `}
 `;
 
 const FixMeContent = (props) => {
-  return <Typography>{props.fixme.title}</Typography>;
+  const { fixme } = props;
+
+  return <Typography>{fixme.title}</Typography>;
 };
 
 const FixMe = (props) => {
   console.log(props);
-  const isAvailable = !!props.fixme;
+  const { fixme, validated } = props;
+  const isAvailable = !!fixme;
 
   return (
     <Tooltip
@@ -42,7 +53,7 @@ const FixMe = (props) => {
       placement="top"
       title={
         isAvailable ? (
-          <FixMeContent fixme={props.fixme} />
+          <FixMeContent {...props} />
         ) : (
           <Typography>FixMe has been removed</Typography>
         )
@@ -52,6 +63,7 @@ const FixMe = (props) => {
         data-type="fixme"
         contentEditable={false}
         isAvailable={isAvailable}
+        validated={!!validated}
         onMouseDown={(e) => {
           e.preventDefault();
 
@@ -61,7 +73,11 @@ const FixMe = (props) => {
         }}
         {...props.attributes}
       >
-        {isAvailable ? props.fixme.title : 'Not Found'}
+        {isAvailable
+          ? validated
+            ? validated.message
+            : 'fixme'
+          : 'unavailable'}
         {props.children}
       </Block>
     </Tooltip>
@@ -69,8 +85,16 @@ const FixMe = (props) => {
 };
 
 const mapStateToProps = (state, props) => {
+  const fixme = find(state.fixmes, (f) => f.id === props.element.id);
+  const validated =
+    fixme &&
+    find(
+      fixme.comments,
+      (cId) => state.comments[cId] && state.comments[cId].validated
+    );
   return {
-    fixme: find(state.fixmes, (f) => f.id === props.element.id)
+    fixme,
+    validated: validated ? state.comments[validated] : null
   };
 };
 

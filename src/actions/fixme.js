@@ -19,3 +19,38 @@ export const removeFixMe = (fixMeId: string) => {
     fixMeId
   };
 };
+
+export const addComment = (fixMeId: string, comment: string) => {
+  const commentId = v4();
+
+  return {
+    type: FixMeActions.ADD_COMMENT,
+    commentId,
+    fixMeId,
+    message: comment
+  };
+};
+
+export const removeComment = (fixMeId: string, commentId: string) => {
+  return {
+    type: FixMeActions.REMOVE_COMMENT,
+    fixMeId,
+    commentId
+  };
+};
+
+export const validateComment = (fixMeId: string, commentId: string) => {
+  return {
+    type: FixMeActions.VALIDATE_COMMENT,
+    fixMeId,
+    commentId
+  };
+};
+
+export const invalidateComment = (fixMeId: string, commentId: string) => {
+  return {
+    type: FixMeActions.INVALIDATE_COMMENT,
+    fixMeId,
+    commentId
+  };
+};

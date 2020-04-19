@@ -1,9 +1,10 @@
-import { filter } from 'lodash';
+import { each, pickBy } from 'lodash';
 
 import { FixMeActions } from '../types/actions/fixme';
 import { SpecActions } from '../types/actions/spec';
 
 export default (state = {}, action) => {
+  let newState = null;
   switch (action.type) {
     case FixMeActions.ADD_COMMENT:
       // Add a comment
@@ -13,20 +14,47 @@ export default (state = {}, action) => {
           id: action.commentId,
           specId: action.specId,
           fixMeId: action.fixMeId,
+          createAt: Date.now(),
+          from: 'Anonymous',
           message: action.message,
           validated: false
         }
       };
-
     case FixMeActions.REMOVE_COMMENT:
       // Remove a comment by id
-      return filter(state, (comment) => comment.id !== action.commentId);
+      return pickBy(state, (c) => c.id !== action.commentId);
+    case FixMeActions.VALIDATE_COMMENT:
+      // Validate a comment
+      newState = {
+        ...state,
+        [action.commentId]: {
+          ...state[action.commentId],
+          validated: true
+        }
+      };
+
+      each(newState, (c, id) => {
+        if (id !== action.commentId && c.fixMeId === action.fixMeId) {
+          c.validated = false;
+        }
+      });
+
+      return newState;
+    case FixMeActions.INVALIDATE_COMMENT:
+      // Invalidate a comment
+      return {
+        ...state,
+        [action.commentId]: {
+          ...state[action.commentId],
+          validated: false
+        }
+      };
     case FixMeActions.REMOVE:
       // Remove comments when a FixMe is removed
-      return filter(state, (comment) => comment.fixMeId !== action.fixMeId);
+      return pickBy(state, (c) => c.fixMeId !== action.fixMeId);
     case SpecActions.REMOVE_PROJECT:
-      // Remove ALL Comments attached to specId
-      return filter(state, (fixme) => fixme.specId !== action.specId);
+      // Remove ALL Fixmes attached to specId
+      return pickBy(state, (c) => c.specId !== action.specId);
     default:
       return state;
   }

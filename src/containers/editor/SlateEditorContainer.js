@@ -62,7 +62,7 @@ const SlateEditorContainer = (props) => {
 
   const renderElement = useCallback(
     (p) => <Element {...p} onFixMeSelected={props.onFixMeSelected} />,
-    []
+    [props.onFixMeSelected]
   );
 
   const handleChange = (value) => {

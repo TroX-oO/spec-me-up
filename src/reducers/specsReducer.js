@@ -1,4 +1,4 @@
-import { filter } from 'lodash';
+import { pickBy } from 'lodash';
 
 import { SpecActions } from '../types/actions/spec';
 import { FixMeActions } from '../types/actions/fixme';
@@ -19,7 +19,7 @@ export default (state: Object = {}, action: Object) => {
       };
     case SpecActions.REMOVE_PROJECT:
       // Remove a project by id
-      return filter(state, (spec) => spec.id !== action.specId);
+      return pickBy(state, (spec) => spec.id !== action.specId);
     case SpecActions.RENAME_PROJECT:
       // Rename project
       return {
