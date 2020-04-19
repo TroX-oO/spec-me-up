@@ -9,7 +9,7 @@ export const createFixMe = (specId: string, title: string) => {
     type: FixMeActions.CREATE,
     fixMeId,
     specId,
-    title: title + ' ' + fixMeId
+    title
   };
 };
 

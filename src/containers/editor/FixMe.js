@@ -10,7 +10,7 @@ const Block = styled.span`
   border: 1px dashed black;
   border-radius: 5px;
   cursor: pointer;
-  padding: 2px 5px;
+  padding: 2px 2px;
   margin-right: 1px;
 
   &:hover {
@@ -31,7 +31,8 @@ const Block = styled.span`
     props.validated &&
     `
     border: 1px solid transparent;
-    background-color: #78ff78;
+    background-color: #dcffdc;
+    margin-right: 0px;
   `}
 `;
 
@@ -42,7 +43,6 @@ const FixMeContent = (props) => {
 };
 
 const FixMe = (props) => {
-  console.log(props);
   const { fixme, validated } = props;
   const isAvailable = !!fixme;
 

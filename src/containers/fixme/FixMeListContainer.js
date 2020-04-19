@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux';
 import { filter, isEmpty, map } from 'lodash';
 
@@ -16,7 +16,7 @@ const renderFixMeList = (fixmes, onClick, onRemoveClick, selected) => {
   ) : (
     map(fixmes, (s) => {
       const isSelected = s.id === selected;
-      console.log('wtf ?');
+
       return (
         <FixMeItemContainer
           fixMeId={s.id}
@@ -41,7 +41,6 @@ const FixMeListContainer = (props) => {
     },
     []
   );
-  console.log('renderrrrrr', props.fixmes);
 
   return (
     <Paper>

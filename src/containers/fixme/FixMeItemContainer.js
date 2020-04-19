@@ -1,9 +1,8 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useRef } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
 import { filter, find } from 'lodash';
 
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
@@ -27,17 +26,15 @@ const AddCommentForm = styled.form`
 `;
 
 const FixMeItemContainer = (props) => {
-  const { fixme, comments, selected } = props;
-  console.log(fixme);
+  const { fixme, selected } = props;
   const commentInputRef = useRef(null);
 
-  const handleRemoveClick = (e) => {
+  const handleRemoveClick = () => {
     props.removeFixMe();
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(commentInputRef.current.value);
     props.addComment(commentInputRef.current.value);
     commentInputRef.current.value = '';
   };
@@ -87,8 +84,6 @@ const FixMeItemContainer = (props) => {
 };
 
 const mapStateToProps = (state, props) => {
-  console.error('map ?');
-  console.log(props);
   return {
     fixme: find(state.fixmes, (f) => f.id === props.fixMeId),
     comments: filter(state.comments, (c) => c.fixMeId === props.fixMeId)

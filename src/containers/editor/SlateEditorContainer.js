@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { Transforms } from 'slate';
 import { Slate, Editable } from 'slate-react';
 
 import Paper from '@material-ui/core/Paper';
@@ -42,7 +41,7 @@ const TextEditorContainer = styled(Paper)`
 
 const Element = (props) => {
   const { attributes, children, element } = props;
-  console.error('render ! ', props);
+
   switch (element.type) {
     case 'fixme':
       return <FixMe {...props} />;
@@ -58,7 +57,6 @@ const DEFAULT = [
 ];
 const SlateEditorContainer = (props) => {
   const [value, setValue] = useState(props.content || DEFAULT);
-  console.log(props);
 
   const renderElement = useCallback(
     (p) => <Element {...p} onFixMeSelected={props.onFixMeSelected} />,
@@ -73,31 +71,10 @@ const SlateEditorContainer = (props) => {
   return (
     <EditorContainerPaper square>
       <Slate editor={props.editor} value={value} onChange={handleChange}>
-        <div
-          onMouseDown={(e) => {
-            e.preventDefault();
-            const id = props.createFixMe('Random title');
-            Transforms.insertNodes(props.editor, {
-              type: 'fixme',
-              id,
-              children: [{ text: '' }]
-            });
-            Transforms.move(props.editor);
-          }}
-        >
-          fixme
-        </div>
-        <Toolbar />
+        <Toolbar createFixMe={props.createFixMe} />
         <EditorPaper square>
           <TextEditorContainer square>
-            <Editable
-              renderElement={renderElement}
-              onBlur={(e, f, g) => {
-                console.log(e);
-                console.log(f);
-                console.log(g);
-              }}
-            />
+            <Editable renderElement={renderElement} />
           </TextEditorContainer>
         </EditorPaper>
       </Slate>

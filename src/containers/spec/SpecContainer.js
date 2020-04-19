@@ -111,6 +111,9 @@ const SpecContainer = (props) => {
   );
   const onFixMeSelected = useCallback((id) => {
     setSelectedFixMe(id);
+    if (id) {
+      setOpen(true);
+    }
   }, []);
 
   const handleDrawerToggle = () => {
@@ -166,8 +169,6 @@ const SpecContainer = (props) => {
 };
 
 const mapStateToProps = (state, props) => {
-  console.log(props);
-  console.log(state);
   return {
     spec: state.specs[props.match.params.specId]
   };

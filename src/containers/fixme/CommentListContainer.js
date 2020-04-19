@@ -1,7 +1,7 @@
-import React, { useCallback, useRef } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { filter, find, map } from 'lodash';
+import { filter, map } from 'lodash';
 
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -35,6 +35,7 @@ const Message = styled(Box)`
   align-self: flex-start;
   border-left: 2px solid #d8d8d8;
   padding-left: 5px;
+  white-space: pre-wrap;
 `;
 
 const ValidationIcon = styled(CheckCircle)`
@@ -57,7 +58,9 @@ const CommentListContainer = (props) => {
       {map(props.comments, (c) => (
         <Comment>
           <Header>
-            <FromText>From: {c.from}</FromText>
+            <FromText>
+              From: {c.from} {new Date(c.createAt).toString()}
+            </FromText>
             <IconButton
               aria-label="delete"
               color="primary"
@@ -87,8 +90,6 @@ const CommentListContainer = (props) => {
 };
 
 const mapStateToProps = (state, props) => {
-  console.error('map ?');
-  console.log(props);
   return {
     comments: filter(state.comments, (c) => c.fixMeId === props.fixMeId)
   };
