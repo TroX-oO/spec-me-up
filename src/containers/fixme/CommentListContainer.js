@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
+import moment from 'moment';
 import { filter, map } from 'lodash';
 
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import ListItem from '@material-ui/core/ListItem';
 import IconButton from '@material-ui/core/IconButton';
+import Divider from '@material-ui/core/Divider';
 
 import DeleteIcon from '@material-ui/icons/Delete';
 import CheckCircle from '@material-ui/icons/CheckCircle';
@@ -24,11 +26,25 @@ const Header = styled(Box)`
 
 const Comment = styled(ListItem)`
   flex-direction: column;
-  margin-left: 5px;
 `;
 
 const FromText = styled(Typography)`
+  display: flex;
+  align-items: center;
+`;
+
+const Time = styled(Typography)`
   flex: 1;
+  font-size: 50%;
+  color: lightgray;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+`;
+
+const ScrollContainer = styled.div`
+  max-height: 200px;
+  overflow-y: auto;
 `;
 
 const Message = styled(Box)`
@@ -43,6 +59,7 @@ const ValidationIcon = styled(CheckCircle)`
 `;
 
 const CommentListContainer = (props) => {
+  const scrollRef = useRef(null);
   const handleRemoveClick = (id) => () => {
     props.removeComment(id);
   };
@@ -53,39 +70,46 @@ const CommentListContainer = (props) => {
     props.invalidateComment(id);
   };
 
+  useEffect(() => {
+    console.log(scrollRef.current);
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [props.comments]);
+
   return (
-    <React.Fragment>
+    <ScrollContainer ref={scrollRef}>
       {map(props.comments, (c) => (
-        <Comment>
-          <Header>
-            <FromText>
-              From: {c.from} {new Date(c.createAt).toString()}
-            </FromText>
-            <IconButton
-              aria-label="delete"
-              color="primary"
-              onClick={handleRemoveClick(c.id)}
-            >
-              <DeleteIcon />
-            </IconButton>
-            <IconButton
-              aria-label="validate"
-              color="primary"
-              onClick={
-                c.validated
-                  ? handleInvalidateClick(c.id)
-                  : handleValidateClick(c.id)
-              }
-            >
-              <ValidationIcon validated={c.validated} />
-            </IconButton>
-          </Header>
-          <Message>
-            <Typography>{c.message}</Typography>
-          </Message>
-        </Comment>
+        <>
+          <Divider />
+          <Comment disableGutters>
+            <Header>
+              <FromText>{c.from}:</FromText>
+              <Time variant="caption">{moment(c.createAt).fromNow()}</Time>
+              <IconButton
+                aria-label="delete"
+                color="primary"
+                onClick={handleRemoveClick(c.id)}
+              >
+                <DeleteIcon />
+              </IconButton>
+              <IconButton
+                aria-label="validate"
+                color="primary"
+                onClick={
+                  c.validated
+                    ? handleInvalidateClick(c.id)
+                    : handleValidateClick(c.id)
+                }
+              >
+                <ValidationIcon validated={c.validated} />
+              </IconButton>
+            </Header>
+            <Message>
+              <Typography>{c.message}</Typography>
+            </Message>
+          </Comment>
+        </>
       ))}
-    </React.Fragment>
+    </ScrollContainer>
   );
 };
 
